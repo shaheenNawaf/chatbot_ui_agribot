@@ -2,7 +2,7 @@ class ChatMessage {
   final String text;
   final bool isUser;
   final DateTime timestamp;
-  final List<String>? relatedCrops;
+  final List<String>? relatedCrops; //Maps to the fake api crop list lmao
 
   ChatMessage({
     required this.text,

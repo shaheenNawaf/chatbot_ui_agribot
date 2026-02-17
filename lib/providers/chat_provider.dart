@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/message_model.dart';
 
 class ChatProvider with ChangeNotifier {
+  // Thank you Gemini, here's where you go in @khesir
   // ==========================================================
   // ⚙️ CONFIGURATION AREA (The "One-Liner" Changes)
   // ==========================================================
@@ -15,8 +16,6 @@ class ChatProvider with ChangeNotifier {
   // For Web/Edge Localhost: "http://127.0.0.1:8000/chat"
   // For Real Online API:    "https://api.agri-pinoy.com/chat"
   final String _apiUrl = "http://127.0.0.1:8000/chat";
-
-  // ==========================================================
 
   final List<ChatMessage> _messages = [
     ChatMessage(
@@ -63,12 +62,13 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // --- OPTION A: MOCK DATA (Active for Testing) ---
   Future<void> _fetchMockResponse() async {
-    await Future.delayed(const Duration(seconds: 2)); // Simulate Network Delay
+    await Future.delayed(
+      const Duration(seconds: 2),
+    ); // network delay kunyari pi
 
     String mockAnswer =
-        "### 🌱 **Potato Cultivation Guide**\n\n" // Header
+        "### 🌱 **Patatas Cultivation Guide**\n\n"
         "Hello! Based on the data, here is the optimal plan:\n\n"
         "**1. 🧪 Fertilizer Recommendations:**\n"
         "   *   Use **Sulfate of Potash (SOP)** instead of Muriate (MOP).\n"
@@ -90,7 +90,7 @@ class ChatProvider with ChangeNotifier {
     );
   }
 
-  // --- OPTION B: REAL API (Ready for Production) ---
+  // FOR THE REAL API NA
   Future<void> _fetchRealApiResponse(String query) async {
     try {
       final response = await http.post(
