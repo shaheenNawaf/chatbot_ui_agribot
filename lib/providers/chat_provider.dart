@@ -10,12 +10,12 @@ class ChatProvider with ChangeNotifier {
   // ==========================================================
 
   // 1. SETTING: Change this to 'false' when your API is live!
-  static const bool _useMockData = true;
+  static const bool _useMockData = false;
 
   // 2. API URL:
   // For Web/Edge Localhost: "http://127.0.0.1:8000/chat"
   // For Real Online API:    "https://api.agri-pinoy.com/chat"
-  final String _apiUrl = "http://127.0.0.1:8000/chat";
+  final String _apiUrl = "https://thesisv2.onrender.com/chat";
 
   final List<ChatMessage> _messages = [
     ChatMessage(
