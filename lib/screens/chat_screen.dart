@@ -17,6 +17,100 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  void _showSettingsSheet(BuildContext context) {
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Settings",
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Document Retrieval (top_k)",
+                            style: GoogleFonts.roboto(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            "How many related documents the AI fetches",
+                            style: GoogleFonts.roboto(
+                              fontSize: 11,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2E7D32),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          "${chatProvider.topK}",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: chatProvider.topK.toDouble(),
+                    min: 1,
+                    max: 5,
+                    divisions: 4,
+                    activeColor: const Color(0xFF2E7D32),
+                    label: chatProvider.topK.toString(),
+                    onChanged: (val) {
+                      chatProvider.setTopK(val.round());
+                      setSheetState(() {});
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("1 (faster)", style: GoogleFonts.roboto(fontSize: 11, color: Colors.grey)),
+                      Text("5 (more context)", style: GoogleFonts.roboto(fontSize: 11, color: Colors.grey)),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -61,6 +155,20 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.tune, color: Colors.white),
+            tooltip: "Settings",
+            onPressed: () => _showSettingsSheet(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_comment_outlined, color: Colors.white),
+            tooltip: "New Chat",
+            onPressed: () {
+              Provider.of<ChatProvider>(context, listen: false).newSession();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

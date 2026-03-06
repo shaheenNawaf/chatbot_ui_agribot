@@ -13,9 +13,18 @@ class ChatProvider with ChangeNotifier {
   static const bool _useMockData = false;
 
   // 2. API URL:
-  // For Web/Edge Localhost: "http://127.0.0.1:8000/chat"
-  // For Real Online API:    "https://api.agri-pinoy.com/chat"
-  final String _apiUrl = "https://thesisv2.onrender.com/chat";
+  // For Web/Edge Localhost: "http://172.20.80.1:8000/chat"
+  // For Real Online API:    "https://thesisv2.onrender.com/chat"
+  final String _apiUrl = "http://192.168.1.16:8000/chat";
+
+  String? _sessionId;
+  int _topK = 1;
+  int get topK => _topK;
+
+  void setTopK(int value) {
+    _topK = value.clamp(1, 5);
+    notifyListeners();
+  }
 
   final List<ChatMessage> _messages = [
     ChatMessage(
@@ -28,6 +37,19 @@ class ChatProvider with ChangeNotifier {
   List<ChatMessage> get messages => _messages;
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  void newSession() {
+    _sessionId = null;
+    _messages.clear();
+    _messages.add(
+      ChatMessage(
+        text: "Kamusta! Ako si Agri-Pinoy Bot. Ask me how to plant your crops.",
+        isUser: false,
+        timestamp: DateTime.now(),
+      ),
+    );
+    notifyListeners();
+  }
 
   Future<void> sendMessage(String userText) async {
     if (userText.trim().isEmpty) return;
@@ -93,18 +115,28 @@ class ChatProvider with ChangeNotifier {
   // FOR THE REAL API NA
   Future<void> _fetchRealApiResponse(String query) async {
     try {
+      final Map<String, dynamic> payload = {
+        "message": query,
+        "top_k": _topK,
+        "include_context": true,
+      };
+      if (_sessionId != null) {
+        payload["session_id"] = _sessionId;
+      }
+
       final response = await http.post(
         Uri.parse(_apiUrl),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "message": query,
-          "top_k": 3,
-          "include_context": true,
-        }),
+        body: jsonEncode(payload),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
+        // Store session_id from first (or any) response
+        if (data['session_id'] != null) {
+          _sessionId = data['session_id'];
+        }
 
         final String botAnswer = data['answer'];
         // Handle cases where 'crops_used' might be null in the JSON
