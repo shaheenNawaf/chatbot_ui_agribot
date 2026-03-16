@@ -19,101 +19,100 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
 
   void _showSettingsSheet(BuildContext context) {
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (_) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
+        return Consumer<ChatProvider>(
+          builder: (context, chatProvider, child) {
+            final Map<int, String> options = {
+              1: "Concise",
+              3: "Balanced",
+              5: "Deep",
+            };
             return Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+              padding: const EdgeInsets.fromLTRB(24, 30, 24, 40),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Settings",
+                    "AI Response Depth",
                     style: GoogleFonts.poppins(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.w600,
+                      color: const Color(0xFF2E7D32),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Document Retrieval (top_k)",
-                            style: GoogleFonts.roboto(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            "How many related documents the AI fetches",
-                            style: GoogleFonts.roboto(
-                              fontSize: 11,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2E7D32),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          "${chatProvider.topK}",
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 8),
+                  Text(
+                    "Choose how detailed you want my answers to be.",
+                    style: GoogleFonts.roboto(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                  Slider(
-                    value: chatProvider.topK.toDouble(),
-                    min: 1,
-                    max: 5,
-                    divisions: 4,
-                    activeColor: const Color(0xFF2E7D32),
-                    label: chatProvider.topK.toString(),
-                    onChanged: (val) {
-                      chatProvider.setTopK(val.round());
-                      setSheetState(() {});
-                    },
+                  const SizedBox(height: 25),
+                  Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: options.entries.map((entry) {
+                          bool isSelected = chatProvider.topK == entry.key;
+                          return InkWell(
+                            onTap: () => chatProvider.setTopK(entry.key),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFF2E7D32)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Text(
+                                entry.value,
+                                style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "1 (faster)",
-                        style: GoogleFonts.roboto(
-                          fontSize: 11,
-                          color: Colors.grey,
-                        ),
+                  const SizedBox(height: 25),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      chatProvider.topK == 1
+                          ? "⚡ Concise: Best for quick facts and fast replies."
+                          : chatProvider.topK == 3
+                          ? "⚖️ Balanced: A mix of explanation and direct tips."
+                          : "📚 Deep: Comprehensive guide with technical details.",
+                      style: GoogleFonts.roboto(
+                        fontSize: 13,
+                        color: const Color(0xFF2E7D32),
+                        fontStyle: FontStyle.italic,
                       ),
-                      Text(
-                        "5 (more context)",
-                        style: GoogleFonts.roboto(
-                          fontSize: 11,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),

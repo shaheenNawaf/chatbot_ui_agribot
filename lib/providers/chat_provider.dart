@@ -23,7 +23,7 @@ class ChatProvider with ChangeNotifier {
   int get topK => _topK;
 
   void setTopK(int value) {
-    _topK = value.clamp(1, 5);
+    _topK = value;
     notifyListeners();
   }
 
