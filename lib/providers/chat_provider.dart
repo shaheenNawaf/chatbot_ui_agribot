@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/message_model.dart';
+import 'dart:math';
 
 class ChatProvider with ChangeNotifier {
   // Thank you Gemini, here's where you go in @khesir
@@ -34,9 +35,33 @@ class ChatProvider with ChangeNotifier {
     ),
   ];
 
+  final List<String> _allPrompts = [
+    "What is the best fertilizer for Cavendish bananas?",
+    "How can I prevent Panama disease in my banana plantation?",
+    "How do I induce flowering in mango trees during the off-season?",
+    "What are the early signs of mango pulp weevil infestation?",
+    "How do I control coconut scale insect infestations?",
+    "What is the recommended spacing for planting hybrid coconuts?",
+    "What is the ideal soil pH for planting sugarcane?",
+    "How can I manage stem borer pests in my sugarcane field?",
+    "What are the shade requirements for growing cacao seedlings?",
+    "How do I treat black pod rot in cacao trees?",
+    "What are the best practices for harvesting and drying abaca fibers?",
+    "When is the best time to plant yellow corn for maximum yield?",
+    "What is the proper way to cure onions after harvesting?",
+    "What is the recommended fertilizer schedule for MD2 pineapples?",
+  ];
+
+  List<String> _currentPrompts = [];
+  List<String> get currentPrompts => _currentPrompts;
+
   List<ChatMessage> get messages => _messages;
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  ChatProvider() {
+    newSession();
+  }
 
   void newSession() {
     _sessionId = null;
@@ -48,6 +73,7 @@ class ChatProvider with ChangeNotifier {
         timestamp: DateTime.now(),
       ),
     );
+    _generateRandomPrompts();
     notifyListeners();
   }
 
@@ -158,5 +184,12 @@ class ChatProvider with ChangeNotifier {
     } catch (e) {
       rethrow; // Pass error to main try-catch block
     }
+  }
+
+  void _generateRandomPrompts() {
+    final random = Random();
+    // Create a copy of the list, shuffle it, and take the first 4
+    final shuffled = List<String>.from(_allPrompts)..shuffle(random);
+    _currentPrompts = shuffled.take(4).toList();
   }
 }

@@ -229,6 +229,47 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
             ),
+          if (chatProvider.messages.length == 1 && !chatProvider.isLoading)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: chatProvider.currentPrompts.map((prompt) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF2E7D32),
+                          side: BorderSide(color: Colors.green[400]!),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          backgroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          // Immediately send the text as a user message
+                          chatProvider.sendMessage(prompt);
+                        },
+                        child: Text(
+                          prompt,
+                          style: GoogleFonts.roboto(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
           Container(
             padding: const EdgeInsets.all(12),
             color: Colors.white,
