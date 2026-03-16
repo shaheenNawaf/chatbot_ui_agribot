@@ -28,7 +28,7 @@ class ChatProvider with ChangeNotifier {
 
   final List<ChatMessage> _messages = [
     ChatMessage(
-      text: "Kamusta! Ako si Agri-Pinoy Bot. Ask me how to plant your crops.",
+      text: "Hi! I'm Agri-Pinoy AI. Ask me how to plant common Pinoy crops!",
       isUser: false,
       timestamp: DateTime.now(),
     ),
@@ -43,7 +43,7 @@ class ChatProvider with ChangeNotifier {
     _messages.clear();
     _messages.add(
       ChatMessage(
-        text: "Kamusta! Ako si Agri-Pinoy Bot. Ask me how to plant your crops.",
+        text: "Hi! I'm Agri-Pinoy AI. Ask me how to plant common Pinoy crops!",
         isUser: false,
         timestamp: DateTime.now(),
       ),

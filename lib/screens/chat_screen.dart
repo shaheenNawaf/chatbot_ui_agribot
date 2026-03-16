@@ -5,6 +5,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import '../providers/chat_provider.dart';
 import '../models/message_model.dart';
+import '../widgets/onboarding_modal.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -98,8 +99,20 @@ class _ChatScreenState extends State<ChatScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("1 (faster)", style: GoogleFonts.roboto(fontSize: 11, color: Colors.grey)),
-                      Text("5 (more context)", style: GoogleFonts.roboto(fontSize: 11, color: Colors.grey)),
+                      Text(
+                        "1 (faster)",
+                        style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        "5 (more context)",
+                        style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -119,6 +132,15 @@ class _ChatScreenState extends State<ChatScreen> {
         curve: Curves.easeOut,
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      OnboardingModal.showIfRequired(context);
+    });
   }
 
   @override
@@ -148,7 +170,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 const Text(
-                  "Gabay sa Pagsasaka",
+                  "Pinoy-Agriculture AI Chat",
                   style: TextStyle(fontSize: 10, color: Colors.white70),
                 ),
               ],
@@ -172,7 +194,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          // Chat List
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -183,7 +204,6 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-
           if (chatProvider.isLoading)
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -209,8 +229,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
             ),
-
-          // User Input box
           Container(
             padding: const EdgeInsets.all(12),
             color: Colors.white,
@@ -220,7 +238,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: TextField(
                     controller: _controller,
                     decoration: InputDecoration(
-                      hintText: "Tanong tungkol sa pananim...",
+                      hintText: "Start typing here...",
                       hintStyle: TextStyle(color: Colors.grey[400]),
                       filled: true,
                       fillColor: Colors.grey[100],
@@ -367,7 +385,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 }).toList(),
               ),
             ],
-
             const SizedBox(height: 6),
             Align(
               alignment: Alignment.bottomRight,
