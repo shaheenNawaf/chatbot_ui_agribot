@@ -32,25 +32,25 @@ class _OnboardingModalState extends State<OnboardingModal> {
     {
       "title": "Welcome to Agri-Pinoy!",
       "subtitle":
-          "Your AI farming assistant. Ask anything about crops, fertilizers, and farming techniques.",
+          "Your AI farming assistant for Philippine cash crops like Mango, Banana, Cacao, and more.",
       "image": "assets/images/step1.png",
     },
     {
       "title": "Ask Specific Questions in English",
       "subtitle":
-          "Be as specific as possible. Example: 'What type of crops can be planted in the Philippines'",
+          "Tap any of the suggested prompts above the chat box to get started with common farming concerns.",
       "image": "assets/images/step2.png",
     },
     {
-      "title": "Adjust AI Settings",
+      "title": "Customize Response Depth",
       "subtitle":
-          "Tap the settings icon to adjust how much context the AI fetches (top_k). Higher means more context, lower means faster replies.",
+          "Use the Settings (tune icon) to choose if you want a Concise, Balanced, or Deep AI answer.",
       "image": "assets/images/step3.png",
     },
     {
       "title": "Start Fresh Anytime",
       "subtitle":
-          "Want to talk about a different crop? Tap the 'New Chat' icon at the top right to clear the session.",
+          "Need to switch crops? Simply tap the 'New Chat' icon at the top right to clear the current session.",
       "image": "assets/images/step4.png",
     },
   ];
