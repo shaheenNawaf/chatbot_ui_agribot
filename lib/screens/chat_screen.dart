@@ -32,6 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
               3: "Balanced",
               5: "Deep",
             };
+
             return Padding(
               padding: const EdgeInsets.fromLTRB(24, 30, 24, 40),
               child: Column(
@@ -55,6 +56,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   const SizedBox(height: 25),
+
+                  // The Segmented Pill Control
                   Center(
                     child: Container(
                       decoration: BoxDecoration(
@@ -93,8 +96,12 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 25),
+
+                  // Contextual Helper Text
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.green[50],
@@ -136,7 +143,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       OnboardingModal.showIfRequired(context);
     });
@@ -145,7 +151,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final chatProvider = Provider.of<ChatProvider>(context);
-
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
     return Scaffold(
@@ -199,7 +204,10 @@ class _ChatScreenState extends State<ChatScreen> {
               padding: const EdgeInsets.all(16),
               itemCount: chatProvider.messages.length,
               itemBuilder: (context, index) {
-                return _buildMessageBubble(chatProvider.messages[index]);
+                return _buildMessageBubble(
+                  context,
+                  chatProvider.messages[index],
+                );
               },
             ),
           ),
@@ -232,43 +240,59 @@ class _ChatScreenState extends State<ChatScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
-                  children: chatProvider.currentPrompts.map((prompt) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF2E7D32),
-                          side: BorderSide(color: Colors.green[400]!),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          backgroundColor: Colors.white,
-                        ),
-                        onPressed: () {
-                          // Immediately send the text as a user message
-                          chatProvider.sendMessage(prompt);
-                        },
-                        child: Text(
-                          prompt,
-                          style: GoogleFonts.roboto(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Quick Prompts:',
+                    style: GoogleFonts.roboto(
+                      color: Colors.green[800],
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: chatProvider.currentPrompts.map((prompt) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF2E7D32),
+                      side: BorderSide(color: Colors.green[400]!),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      backgroundColor: Colors.white,
+                      alignment: Alignment.centerLeft,
+                    ),
+                    onPressed: () {
+                      chatProvider.sendMessage(prompt);
+                    },
+                    child: Text(
+                      prompt,
+                      style: GoogleFonts.roboto(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.all(12),
             color: Colors.white,
@@ -317,11 +341,16 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  //Reponse bubble ; with markdown nani for better ux
-  Widget _buildMessageBubble(ChatMessage msg) {
+  // Passing context here so we can trigger the Provider inside the button
+  Widget _buildMessageBubble(BuildContext context, ChatMessage msg) {
     bool isUser = msg.isUser;
-    // Check if we have chips to display - tyy
+    bool isFallback = msg.isFallback;
     bool hasTags = msg.relatedCrops != null && msg.relatedCrops!.isNotEmpty;
+
+    // 🌟 DYNAMIC BACKGROUND: Green for User, Orange/Yellow for Fallback, White for Bot
+    Color bubbleColor = isUser
+        ? const Color(0xFF43A047)
+        : (isFallback ? Colors.orange.shade50 : Colors.white);
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -330,13 +359,16 @@ class _ChatScreenState extends State<ChatScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         constraints: const BoxConstraints(maxWidth: 320),
         decoration: BoxDecoration(
-          color: isUser ? const Color(0xFF43A047) : Colors.white,
+          color: bubbleColor,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(20),
             topRight: const Radius.circular(20),
             bottomLeft: isUser ? const Radius.circular(20) : Radius.zero,
             bottomRight: isUser ? Radius.zero : const Radius.circular(20),
           ),
+          border: isFallback
+              ? Border.all(color: Colors.orange.shade300, width: 1.5)
+              : null,
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.1),
@@ -351,10 +383,13 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             MarkdownBody(
               data: msg.text,
-              selectable: true, // Allows user to copy text
+              selectable: true,
               styleSheet: MarkdownStyleSheet(
                 p: GoogleFonts.roboto(
-                  color: isUser ? Colors.white : Colors.black87,
+                  // 🌟 Text turns dark orange if it's a fallback warning
+                  color: isUser
+                      ? Colors.white
+                      : (isFallback ? Colors.orange.shade900 : Colors.black87),
                   fontSize: 15,
                   height: 1.5,
                 ),
@@ -367,9 +402,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   fontStyle: FontStyle.italic,
                 ),
                 h3: GoogleFonts.poppins(
-                  color: isUser
-                      ? Colors.white
-                      : const Color(0xFF2E7D32), // Green headers for bot
+                  color: isUser ? Colors.white : const Color(0xFF2E7D32),
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -425,6 +458,37 @@ class _ChatScreenState extends State<ChatScreen> {
                 }).toList(),
               ),
             ],
+
+            // 🌟 ACTIONABLE FALLBACK BUTTON
+            if (isFallback) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange.shade600,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: Text(
+                    "Start New Chat",
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  ),
+                  onPressed: () {
+                    // Triggers the New Session function to bring back prompts
+                    Provider.of<ChatProvider>(
+                      context,
+                      listen: false,
+                    ).newSession();
+                  },
+                ),
+              ),
+            ],
+
             const SizedBox(height: 6),
             Align(
               alignment: Alignment.bottomRight,

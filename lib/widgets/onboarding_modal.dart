@@ -92,7 +92,6 @@ class _OnboardingModalState extends State<OnboardingModal> {
                     ),
                     child: Column(
                       children: [
-                        // --- EMPTY SPACE FOR SCREENSHOTS ---
                         Expanded(
                           child: Container(
                             width: double.infinity,
@@ -115,12 +114,10 @@ class _OnboardingModalState extends State<OnboardingModal> {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    "Insert Screenshot Here\n(${index + 1}/4)",
+                                    "Placeholder.\n(${index + 1}/4)",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(color: Colors.grey[500]),
                                   ),
-                                  // TODO: Replace Center with Image.asset(_pages[index]['image']!)
-                                  // when you add your actual image files.
                                 ],
                               ),
                             ),
@@ -137,7 +134,6 @@ class _OnboardingModalState extends State<OnboardingModal> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 10),
-                        // Subtitle
                         Text(
                           _pages[index]['subtitle']!,
                           style: GoogleFonts.roboto(

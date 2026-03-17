@@ -1,21 +1,14 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/message_model.dart';
-import 'dart:math';
 
 class ChatProvider with ChangeNotifier {
-  // Thank you Gemini, here's where you go in @khesir
   // ==========================================================
-  // ⚙️ CONFIGURATION AREA (The "One-Liner" Changes)
+  // ⚙️ CONFIGURATION AREA
   // ==========================================================
-
-  // 1. SETTING: Change this to 'false' when your API is live!
-  static const bool _useMockData = false;
-
-  // 2. API URL:
-  // For Web/Edge Localhost: "http://172.20.80.1:8000/chat"
-  // For Real Online API:    "https://thesisv2.onrender.com/chat"
+  static const bool _useMockData = true;
   final String _apiUrl = "http://192.168.1.16:8000/chat";
 
   String? _sessionId;
@@ -23,17 +16,9 @@ class ChatProvider with ChangeNotifier {
   int get topK => _topK;
 
   void setTopK(int value) {
-    _topK = value;
+    _topK = value.clamp(1, 5);
     notifyListeners();
   }
-
-  final List<ChatMessage> _messages = [
-    ChatMessage(
-      text: "Hi! I'm Agri-Pinoy AI. Ask me how to plant common Pinoy crops!",
-      isUser: false,
-      timestamp: DateTime.now(),
-    ),
-  ];
 
   final List<String> _allPrompts = [
     "What is the best fertilizer for Cavendish bananas?",
@@ -55,12 +40,21 @@ class ChatProvider with ChangeNotifier {
   List<String> _currentPrompts = [];
   List<String> get currentPrompts => _currentPrompts;
 
+  final List<ChatMessage> _messages = [];
   List<ChatMessage> get messages => _messages;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  // Constructor runs once on app start
   ChatProvider() {
     newSession();
+  }
+
+  void _generateRandomPrompts() {
+    final random = Random();
+    final shuffled = List<String>.from(_allPrompts)..shuffle(random);
+    _currentPrompts = shuffled.take(4).toList();
   }
 
   void newSession() {
@@ -71,6 +65,7 @@ class ChatProvider with ChangeNotifier {
         text: "Hi! I'm Agri-Pinoy AI. Ask me how to plant common Pinoy crops!",
         isUser: false,
         timestamp: DateTime.now(),
+        isFallback: false,
       ),
     );
     _generateRandomPrompts();
@@ -80,13 +75,16 @@ class ChatProvider with ChangeNotifier {
   Future<void> sendMessage(String userText) async {
     if (userText.trim().isEmpty) return;
 
-    // 1. Add User Message to UI immediately
     _messages.add(
-      ChatMessage(text: userText, isUser: true, timestamp: DateTime.now()),
+      ChatMessage(
+        text: userText,
+        isUser: true,
+        timestamp: DateTime.now(),
+        isFallback: false,
+      ),
     );
     notifyListeners();
 
-    // 2. Process Request (Mock or Real)
     _isLoading = true;
     notifyListeners();
 
@@ -102,6 +100,7 @@ class ChatProvider with ChangeNotifier {
           text: "Connection Error: $e",
           isUser: false,
           timestamp: DateTime.now(),
+          isFallback: true, // Treat network errors as a fallback scenario too
         ),
       );
     }
@@ -111,12 +110,10 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future<void> _fetchMockResponse() async {
-    await Future.delayed(
-      const Duration(seconds: 2),
-    ); // network delay kunyari pi
+    await Future.delayed(const Duration(seconds: 2));
 
     String mockAnswer =
-        "### 🌱 **Patatas Cultivation Guide**\n\n"
+        "### 🌱 **Potato Cultivation Guide**\n\n"
         "Hello! Based on the data, here is the optimal plan:\n\n"
         "**1. 🧪 Fertilizer Recommendations:**\n"
         "   *   Use **Sulfate of Potash (SOP)** instead of Muriate (MOP).\n"
@@ -126,19 +123,17 @@ class ChatProvider with ChangeNotifier {
         "   *   **Spacing:** 30cm between plants.\n\n"
         "💡 **Pro Tip:** Ensure adequate water supply during the *tuber bulking* stage!";
 
-    List<String> mockCrops = ["Rice", "Maize", "Potatoes"];
-
     _messages.add(
       ChatMessage(
         text: mockAnswer,
         isUser: false,
-        relatedCrops: mockCrops,
+        relatedCrops: ["Rice", "Maize", "Potatoes"],
         timestamp: DateTime.now(),
+        isFallback: true,
       ),
     );
   }
 
-  // FOR THE REAL API NA
   Future<void> _fetchRealApiResponse(String query) async {
     try {
       final Map<String, dynamic> payload = {
@@ -159,16 +154,31 @@ class ChatProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        // Store session_id from first (or any) response
         if (data['session_id'] != null) {
           _sessionId = data['session_id'];
         }
 
         final String botAnswer = data['answer'];
-        // Handle cases where 'crops_used' might be null in the JSON
         final List<String> crops = data['crops_used'] != null
             ? List<String>.from(data['crops_used'])
             : [];
+
+        // ==========================================================
+        // ⚠️ FRONTEND FALLBACK DETECTION (STRING MATCHING) - @khesir
+        // TODO (Backend): Add a flag like `"context_found": false` in the API response
+        // so we don't have to rely on string matching in the future!
+        // ==========================================================
+        final String lowerAnswer = botAnswer.toLowerCase();
+        bool isFallback = false;
+
+        if (lowerAnswer.contains("can't find information") ||
+            lowerAnswer.contains("i don't have information") ||
+            lowerAnswer.contains("not mentioned in the provided context") ||
+            lowerAnswer.contains("i cannot answer") ||
+            lowerAnswer.contains("does not contain information") ||
+            lowerAnswer.contains("i don't know")) {
+          isFallback = true;
+        }
 
         _messages.add(
           ChatMessage(
@@ -176,20 +186,14 @@ class ChatProvider with ChangeNotifier {
             isUser: false,
             relatedCrops: crops,
             timestamp: DateTime.now(),
+            isFallback: isFallback,
           ),
         );
       } else {
         throw Exception("Server returned ${response.statusCode}");
       }
     } catch (e) {
-      rethrow; // Pass error to main try-catch block
+      rethrow;
     }
-  }
-
-  void _generateRandomPrompts() {
-    final random = Random();
-    // Create a copy of the list, shuffle it, and take the first 4
-    final shuffled = List<String>.from(_allPrompts)..shuffle(random);
-    _currentPrompts = shuffled.take(4).toList();
   }
 }
