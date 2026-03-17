@@ -254,45 +254,46 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
             ),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: chatProvider.currentPrompts.map((prompt) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF2E7D32),
-                      side: BorderSide(color: Colors.green[400]!),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+          if (chatProvider.messages.length == 1 && !chatProvider.isLoading)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: chatProvider.currentPrompts.map((prompt) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF2E7D32),
+                        side: BorderSide(color: Colors.green[400]!),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        backgroundColor: Colors.white,
+                        alignment: Alignment.centerLeft,
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
+                      onPressed: () {
+                        chatProvider.sendMessage(prompt);
+                      },
+                      child: Text(
+                        prompt,
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          height: 1.3,
+                        ),
+                        textAlign: TextAlign.left,
                       ),
-                      backgroundColor: Colors.white,
-                      alignment: Alignment.centerLeft,
                     ),
-                    onPressed: () {
-                      chatProvider.sendMessage(prompt);
-                    },
-                    child: Text(
-                      prompt,
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        height: 1.3,
-                      ),
-                      textAlign: TextAlign.left,
-                    ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
           Container(
             padding: const EdgeInsets.all(12),
             color: Colors.white,
