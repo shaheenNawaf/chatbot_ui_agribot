@@ -8,8 +8,9 @@ class ChatProvider with ChangeNotifier {
   // ==========================================================
   // ⚙️ CONFIGURATION AREA
   // ==========================================================
-  static const bool _useMockData = true;
-  final String _apiUrl = "http://192.168.1.16:8000/chat";
+  static const bool _useMockData = false;
+  final String _apiUrl = "http://165.22.247.173:8000/chat";
+  // final String _apiUrl = "http://192.168.1.34:8000/chat";
 
   String? _sessionId;
   int _topK = 1;
