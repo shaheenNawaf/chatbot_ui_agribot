@@ -27,11 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (_) {
         return Consumer<ChatProvider>(
           builder: (context, chatProvider, child) {
-            final Map<int, String> options = {
-              1: "Concise",
-              3: "Balanced",
-              5: "Deep",
-            };
+            final Map<int, String> options = {3: "Balanced", 5: "Deep"};
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(24, 30, 24, 40),
@@ -56,8 +52,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   const SizedBox(height: 25),
-
-                  // The Segmented Pill Control
                   Center(
                     child: Container(
                       decoration: BoxDecoration(
