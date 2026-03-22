@@ -5,9 +5,6 @@ import 'package:http/http.dart' as http;
 import '../models/message_model.dart';
 
 class ChatProvider with ChangeNotifier {
-  // ==========================================================
-  // ⚙️ CONFIGURATION AREA
-  // ==========================================================
   static const bool _useMockData = false;
   final String _apiUrl = "http://165.22.247.173:8000/chat";
   // final String _apiUrl = "http://192.168.1.34:8000/chat";
@@ -17,7 +14,7 @@ class ChatProvider with ChangeNotifier {
   int get topK => _topK;
 
   void setTopK(int value) {
-    _topK = value.clamp(1, 5);
+    _topK = value.clamp(1, 10);
     notifyListeners();
   }
 
@@ -90,11 +87,7 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      if (_useMockData) {
-        await _fetchMockResponse();
-      } else {
-        await _fetchRealApiResponse(userText);
-      }
+      await _fetchRealApiResponse(userText);
     } catch (e) {
       _messages.add(
         ChatMessage(
@@ -110,30 +103,30 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _fetchMockResponse() async {
-    await Future.delayed(const Duration(seconds: 2));
+  // Future<void> _fetchMockResponse() async {
+  //   await Future.delayed(const Duration(seconds: 2));
 
-    String mockAnswer =
-        "### 🌱 **Potato Cultivation Guide**\n\n"
-        "Hello! Based on the data, here is the optimal plan:\n\n"
-        "**1. 🧪 Fertilizer Recommendations:**\n"
-        "   *   Use **Sulfate of Potash (SOP)** instead of Muriate (MOP).\n"
-        "   *   📉 *Nitrogen:* Reduce usage if you planted legumes previously.\n\n"
-        "**2. 📏 Planting Strategy:**\n"
-        "   *   **Depth:** 10-15cm deep.\n"
-        "   *   **Spacing:** 30cm between plants.\n\n"
-        "💡 **Pro Tip:** Ensure adequate water supply during the *tuber bulking* stage!";
+  //   String mockAnswer =
+  //       "### 🌱 **Potato Cultivation Guide**\n\n"
+  //       "Hello! Based on the data, here is the optimal plan:\n\n"
+  //       "**1. 🧪 Fertilizer Recommendations:**\n"
+  //       "   *   Use **Sulfate of Potash (SOP)** instead of Muriate (MOP).\n"
+  //       "   *   📉 *Nitrogen:* Reduce usage if you planted legumes previously.\n\n"
+  //       "**2. 📏 Planting Strategy:**\n"
+  //       "   *   **Depth:** 10-15cm deep.\n"
+  //       "   *   **Spacing:** 30cm between plants.\n\n"
+  //       "💡 **Pro Tip:** Ensure adequate water supply during the *tuber bulking* stage!";
 
-    _messages.add(
-      ChatMessage(
-        text: mockAnswer,
-        isUser: false,
-        relatedCrops: ["Rice", "Maize", "Potatoes"],
-        timestamp: DateTime.now(),
-        isFallback: true,
-      ),
-    );
-  }
+  //   _messages.add(
+  //     ChatMessage(
+  //       text: mockAnswer,
+  //       isUser: false,
+  //       relatedCrops: ["Rice", "Maize", "Potatoes"],
+  //       timestamp: DateTime.now(),
+  //       isFallback: true,
+  //     ),
+  //   );
+  // }
 
   Future<void> _fetchRealApiResponse(String query) async {
     try {
@@ -146,11 +139,22 @@ class ChatProvider with ChangeNotifier {
         payload["session_id"] = _sessionId;
       }
 
+      print("╔══ REQUEST ════════════════════════════");
+      print("║ top_k   : $_topK");
+      print("║ payload : ${jsonEncode(payload)}");
+      print("╚═══════════════════════════════════════");
+
       final response = await http.post(
         Uri.parse(_apiUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );
+
+      print("╔══ RESPONSE ═══════════════════════════");
+      print("║ status  : ${response.statusCode}");
+      print("║ top_k   : $_topK");
+      print("║ body    : ${response.body}");
+      print("╚═══════════════════════════════════════");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

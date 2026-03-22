@@ -27,7 +27,12 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (_) {
         return Consumer<ChatProvider>(
           builder: (context, chatProvider, child) {
-            final Map<int, String> options = {3: "Balanced", 5: "Deep"};
+            final Map<int, String> options = {
+              1: "Concise",
+              3: "Balanced",
+              5: "Deep",
+              10: "Test",
+            };
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(24, 30, 24, 40),
@@ -93,7 +98,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   const SizedBox(height: 25),
 
-                  // Contextual Helper Text
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
@@ -103,10 +107,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     child: Text(
                       chatProvider.topK == 1
-                          ? "⚡ Concise: Best for quick facts and fast replies."
+                          ? "👋 Concise: Fast and short output."
                           : chatProvider.topK == 3
                           ? "⚖️ Balanced: A mix of explanation and direct tips."
-                          : "📚 Deep: Comprehensive guide with technical details.",
+                          : chatProvider.topK == 5
+                          ? "📚 Deep: Comprehensive guide with technical details."
+                          : "Test",
                       style: GoogleFonts.roboto(
                         fontSize: 13,
                         color: const Color(0xFF2E7D32),
@@ -349,7 +355,9 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        constraints: const BoxConstraints(maxWidth: 320),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.85,
+        ),
         decoration: BoxDecoration(
           color: bubbleColor,
           borderRadius: BorderRadius.only(
