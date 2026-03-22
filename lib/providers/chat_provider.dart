@@ -163,24 +163,31 @@ class ChatProvider with ChangeNotifier {
         final List<String> crops = data['crops_used'] != null
             ? List<String>.from(data['crops_used'])
             : [];
-
-        // ==========================================================
-        // ⚠️ FRONTEND FALLBACK DETECTION (STRING MATCHING) - @khesir
-        // TODO (Backend): Add a flag like `"context_found": false` in the API response
-        // so we don't have to rely on string matching in the future!
-        // ==========================================================
         final String lowerAnswer = botAnswer.toLowerCase();
         bool isFallback = false;
-
         if (lowerAnswer.contains("can't find information") ||
             lowerAnswer.contains("i don't have information") ||
             lowerAnswer.contains("not mentioned in the provided context") ||
             lowerAnswer.contains("i cannot answer") ||
             lowerAnswer.contains("does not contain information") ||
-            lowerAnswer.contains("i don't know")) {
+            lowerAnswer.contains("i don't know") ||
+            lowerAnswer.contains("there is no crop information") ||
+            lowerAnswer.contains("There is no crop information") ||
+            lowerAnswer.contains("I don't have information") ||
+            lowerAnswer.contains("I have no information") ||
+            lowerAnswer.contains("unfortunately") ||
+            lowerAnswer.contains("unfortunately, there is no information") ||
+            lowerAnswer.contains(
+              "Unfortunately, I don't have any information",
+            ) ||
+            lowerAnswer.contains(
+              "unfortunately, the provided crop information",
+            ) ||
+            lowerAnswer.contains("but the crop information provided") ||
+            lowerAnswer.contains("i'm afraid the information provided") ||
+            lowerAnswer.contains("i'm afraid the crop information provided")) {
           isFallback = true;
         }
-
         _messages.add(
           ChatMessage(
             text: botAnswer,

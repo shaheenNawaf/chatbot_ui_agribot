@@ -342,13 +342,10 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // Passing context here so we can trigger the Provider inside the button
   Widget _buildMessageBubble(BuildContext context, ChatMessage msg) {
     bool isUser = msg.isUser;
     bool isFallback = msg.isFallback;
     bool hasTags = msg.relatedCrops != null && msg.relatedCrops!.isNotEmpty;
-
-    // 🌟 DYNAMIC BACKGROUND: Green for User, Orange/Yellow for Fallback, White for Bot
     Color bubbleColor = isUser
         ? const Color(0xFF43A047)
         : (isFallback ? Colors.orange.shade50 : Colors.white);
@@ -387,7 +384,6 @@ class _ChatScreenState extends State<ChatScreen> {
               selectable: true,
               styleSheet: MarkdownStyleSheet(
                 p: GoogleFonts.roboto(
-                  // 🌟 Text turns dark orange if it's a fallback warning
                   color: isUser
                       ? Colors.white
                       : (isFallback ? Colors.orange.shade900 : Colors.black87),
@@ -412,55 +408,53 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
-
-            if (hasTags) ...[
-              const SizedBox(height: 12),
-              Divider(
-                height: 1,
-                color: isUser ? Colors.white24 : Colors.grey[200],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Related Topics:",
-                style: GoogleFonts.roboto(
-                  fontSize: 10,
-                  color: isUser ? Colors.white70 : Colors.grey[500],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Wrap(
-                spacing: 6.0,
-                runSpacing: 4.0,
-                children: msg.relatedCrops!.map((crop) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isUser
-                          ? Colors.white.withOpacity(0.2)
-                          : Colors.green[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isUser ? Colors.white30 : Colors.green[100]!,
-                      ),
-                    ),
-                    child: Text(
-                      crop,
-                      style: GoogleFonts.roboto(
-                        fontSize: 11,
-                        color: isUser ? Colors.white : Colors.green[800],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-
-            // 🌟 ACTIONABLE FALLBACK BUTTON
+            // Removed the related crops - no need
+            // if (hasTags) ...[
+            //   const SizedBox(height: 12),
+            //   Divider(
+            //     height: 1,
+            //     color: isUser ? Colors.white24 : Colors.grey[200],
+            //   ),
+            //   const SizedBox(height: 8),
+            //   Text(
+            //     "Related Topics:",
+            //     style: GoogleFonts.roboto(
+            //       fontSize: 10,
+            //       color: isUser ? Colors.white70 : Colors.grey[500],
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            //   const SizedBox(height: 4),
+            //   Wrap(
+            //     spacing: 6.0,
+            //     runSpacing: 4.0,
+            //     children: msg.relatedCrops!.map((crop) {
+            //       return Container(
+            //         padding: const EdgeInsets.symmetric(
+            //           horizontal: 10,
+            //           vertical: 4,
+            //         ),
+            //         decoration: BoxDecoration(
+            //           color: isUser
+            //               ? Colors.white.withOpacity(0.2)
+            //               : Colors.green[50],
+            //           borderRadius: BorderRadius.circular(12),
+            //           border: Border.all(
+            //             color: isUser ? Colors.white30 : Colors.green[100]!,
+            //           ),
+            //         ),
+            //         child: Text(
+            //           crop,
+            //           style: GoogleFonts.roboto(
+            //             fontSize: 11,
+            //             color: isUser ? Colors.white : Colors.green[800],
+            //             fontWeight: FontWeight.w500,
+            //           ),
+            //         ),
+            //       );
+            //     }).toList(),
+            //   ),
+            // ],
             if (isFallback) ...[
               const SizedBox(height: 12),
               SizedBox(
@@ -480,7 +474,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                   ),
                   onPressed: () {
-                    // Triggers the New Session function to bring back prompts
                     Provider.of<ChatProvider>(
                       context,
                       listen: false,
@@ -489,7 +482,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ],
-
             const SizedBox(height: 6),
             Align(
               alignment: Alignment.bottomRight,

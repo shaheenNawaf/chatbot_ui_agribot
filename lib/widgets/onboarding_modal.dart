@@ -32,7 +32,7 @@ class _OnboardingModalState extends State<OnboardingModal> {
     {
       "title": "Welcome to Agri-Pinoy!",
       "subtitle":
-          "Your AI farming assistant for Philippine cash crops like Mango, Banana, Cacao, and more.",
+          "Your AI farming assistant for Philippine cash crops like Rice, Corn, Cocoa, Banana and Wheat.",
       "image": "assets/images/step1.png",
     },
     {
