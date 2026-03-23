@@ -44,7 +44,6 @@ class ChatProvider with ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  // Constructor runs once on app start
   ChatProvider() {
     newSession();
   }
