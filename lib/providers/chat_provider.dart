@@ -18,6 +18,7 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  //Update Questions - sha
   final List<String> _allPrompts = [
     "What is the best fertilizer for Cavendish bananas?",
     "How can I prevent Panama disease in my banana plantation?",
@@ -166,6 +167,14 @@ class ChatProvider with ChangeNotifier {
         final List<String> crops = data['crops_used'] != null
             ? List<String>.from(data['crops_used'])
             : [];
+        final List<String> chunks = [];
+        if (data['context'] != null) {
+          final RegExp exp = RegExp(r'^# (.+)$', multiLine: true);
+          final matches = exp.allMatches(data['context'] as String);
+          for (final m in matches) {
+            if (m.group(1) != null) chunks.add(m.group(1)!);
+          }
+        }
         final String lowerAnswer = botAnswer.toLowerCase();
         bool isFallback = false;
         if (lowerAnswer.contains("can't find information") ||
@@ -188,7 +197,19 @@ class ChatProvider with ChangeNotifier {
             ) ||
             lowerAnswer.contains("but the crop information provided") ||
             lowerAnswer.contains("i'm afraid the information provided") ||
-            lowerAnswer.contains("i'm afraid the crop information provided")) {
+            lowerAnswer.contains("i'm afraid the crop information provided") ||
+            lowerAnswer.contains(
+              "are not explicitly mentioned in the provided crop information",
+            ) ||
+            lowerAnswer.contains('There is no information') ||
+            lowerAnswer.contains("There's no information provided") ||
+            lowerAnswer.contains("There's no information") ||
+            lowerAnswer.contains("I don't see any information") ||
+            lowerAnswer.contains("I couldn't find any information") ||
+            lowerAnswer.contains("there's no information") ||
+            lowerAnswer.contains("there's no mention") ||
+            lowerAnswer.contains("there is no mention") ||
+            lowerAnswer.contains("there is no information")) {
           isFallback = true;
         }
         _messages.add(
@@ -196,6 +217,7 @@ class ChatProvider with ChangeNotifier {
             text: botAnswer,
             isUser: false,
             relatedCrops: crops,
+            checkedChunks: chunks,
             timestamp: DateTime.now(),
             isFallback: isFallback,
           ),

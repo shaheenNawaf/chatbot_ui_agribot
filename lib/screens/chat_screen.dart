@@ -410,6 +410,84 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
+            if (hasTags) ...[
+              const SizedBox(height: 10),
+              Divider(height: 1, color: Colors.grey[200]),
+              const SizedBox(height: 8),
+              Text(
+                "🌾 Relevant Crops:",
+                style: GoogleFonts.roboto(
+                  fontSize: 11,
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6.0,
+                runSpacing: 4.0,
+                children: msg.relatedCrops!.map((crop) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green[100]!),
+                    ),
+                    child: Text(
+                      crop,
+                      style: GoogleFonts.roboto(
+                        fontSize: 11,
+                        color: Colors.green[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+            if (msg.checkedChunks != null && msg.checkedChunks!.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Divider(height: 1, color: Colors.grey[200]),
+              const SizedBox(height: 8),
+              Text(
+                "📦 Checked Chunks:",
+                style: GoogleFonts.roboto(
+                  fontSize: 11,
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6.0,
+                runSpacing: 4.0,
+                children: msg.checkedChunks!.map((chunk) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue[100]!),
+                    ),
+                    child: Text(
+                      chunk,
+                      style: GoogleFonts.roboto(
+                        fontSize: 11,
+                        color: Colors.blue[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
             if (isFallback) ...[
               const SizedBox(height: 12),
               SizedBox(

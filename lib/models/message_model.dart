@@ -3,6 +3,7 @@ class ChatMessage {
   final bool isUser;
   final DateTime timestamp;
   final List<String>? relatedCrops;
+  final List<String>? checkedChunks;
   final bool isFallback;
 
   ChatMessage({
@@ -10,6 +11,7 @@ class ChatMessage {
     required this.isUser,
     required this.timestamp,
     required this.isFallback,
+    this.checkedChunks,
     this.relatedCrops,
   });
 }
