@@ -355,9 +355,7 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.85,
-        ),
+        constraints: const BoxConstraints(maxWidth: 350),
         decoration: BoxDecoration(
           color: bubbleColor,
           borderRadius: BorderRadius.only(
