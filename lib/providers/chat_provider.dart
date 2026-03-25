@@ -5,9 +5,7 @@ import 'package:http/http.dart' as http;
 import '../models/message_model.dart';
 
 class ChatProvider with ChangeNotifier {
-  //static const bool _useMockData = false;
   final String _apiUrl = "http://165.22.247.173:8000/chat";
-  // final String _apiUrl = "http://192.168.1.34:8000/chat";
 
   String? _sessionId;
   int _topK = 1;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../screens/onboarding_eval_screen.dart';
 
 class OnboardingModal extends StatefulWidget {
   const OnboardingModal({super.key});
@@ -8,11 +9,16 @@ class OnboardingModal extends StatefulWidget {
   @override
   State<OnboardingModal> createState() => _OnboardingModalState();
 
+  // Checks both flags:
+  // - 'onboarding_complete' → true means eval is done, skip everything
+  // - 'show_onboarding' → false means user checked "Do not show again" (legacy, kept for safety)
   static Future<void> showIfRequired(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
 
-    final shouldShow = prefs.getBool('show_onboarding') ?? true;
+    final evalComplete = prefs.getBool('onboarding_complete') ?? false;
+    if (evalComplete) return;
 
+    final shouldShow = prefs.getBool('show_onboarding') ?? true;
     if (shouldShow && context.mounted) {
       showDialog(
         context: context,
@@ -62,6 +68,9 @@ class _OnboardingModalState extends State<OnboardingModal> {
     }
     if (mounted) {
       Navigator.of(context).pop();
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const OnboardingEvalScreen()));
     }
   }
 
@@ -96,7 +105,7 @@ class _OnboardingModalState extends State<OnboardingModal> {
                           child: Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Colors.grey[200], // Placeholder color
+                              color: Colors.grey[200],
                               borderRadius: BorderRadius.circular(15),
                               border: Border.all(
                                 color: Colors.green[200]!,
@@ -149,7 +158,6 @@ class _OnboardingModalState extends State<OnboardingModal> {
                 },
               ),
             ),
-
             Expanded(
               flex: 2,
               child: Padding(
@@ -175,9 +183,7 @@ class _OnboardingModalState extends State<OnboardingModal> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -197,7 +203,6 @@ class _OnboardingModalState extends State<OnboardingModal> {
                         ),
                       ],
                     ),
-
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(

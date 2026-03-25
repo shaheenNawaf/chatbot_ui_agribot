@@ -8,7 +8,9 @@ import '../models/message_model.dart';
 import '../widgets/onboarding_modal.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final bool onboardingComplete;
+
+  const ChatScreen({super.key, this.onboardingComplete = false});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -95,9 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 25),
-
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
@@ -143,9 +143,12 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      OnboardingModal.showIfRequired(context);
-    });
+    // Only trigger the onboarding modal if the eval flow hasn't been completed.
+    if (!widget.onboardingComplete) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        OnboardingModal.showIfRequired(context);
+      });
+    }
   }
 
   @override
