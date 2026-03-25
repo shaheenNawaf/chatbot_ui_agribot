@@ -2,9 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'dart:js_interop';
-import 'dart:ui_web' as ui_web;
-import 'package:web/web.dart' as web;
+import 'web_registry_stub.dart'
+    if (dart.library.js_interop) 'web_registry_web.dart';
 
 // Shown after all 10 eval questions are rated.
 // On Android: renders the Google Form in an in-app WebView.
@@ -68,21 +67,9 @@ class _GoogleFormModalState extends State<GoogleFormModal> {
   }
 
   void _registerIframe() {
-    ui_web.platformViewRegistry.registerViewFactory(
-      'google-form-iframe-${widget.deviceId}',
-      (int viewId) {
-        final iframe =
-            web.document.createElement('iframe') as web.HTMLIFrameElement;
-        iframe.src = _formUrl;
-        iframe.style.border = 'none';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.onload = (web.Event _) {
-          if (mounted) setState(() => _isLoading = false);
-        }.toJS;
-        return iframe;
-      },
-    );
+    registerIframeView('google-form-iframe-${widget.deviceId}', _formUrl, () {
+      if (mounted) setState(() => _isLoading = false);
+    });
   }
 
   @override

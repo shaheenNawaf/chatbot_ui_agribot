@@ -9,8 +9,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await SupabaseEvalService.initialize(
-    supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
-    supabaseAnonKey: String.fromEnvironment('SUPABASE_ANON_KEY'),
+    supabaseUrl: const String.fromEnvironment('SUPABASE_URL'),
+    supabaseAnonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
   );
 
   final prefs = await SharedPreferences.getInstance();
