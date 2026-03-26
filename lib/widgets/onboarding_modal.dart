@@ -9,17 +9,12 @@ class OnboardingModal extends StatefulWidget {
   @override
   State<OnboardingModal> createState() => _OnboardingModalState();
 
-  // Checks both flags:
-  // - 'onboarding_complete' → true means eval is done, skip everything
-  // - 'show_onboarding' → false means user checked "Do not show again" (legacy, kept for safety)
   static Future<void> showIfRequired(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-
     final evalComplete = prefs.getBool('onboarding_complete') ?? false;
     if (evalComplete) return;
 
-    final shouldShow = prefs.getBool('show_onboarding') ?? true;
-    if (shouldShow && context.mounted) {
+    if (context.mounted) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -112,22 +107,12 @@ class _OnboardingModalState extends State<OnboardingModal> {
                                 width: 2,
                               ),
                             ),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.image_outlined,
-                                    size: 50,
-                                    color: Colors.grey[400],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    "Placeholder.\n(${index + 1}/4)",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.grey[500]),
-                                  ),
-                                ],
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: Image.asset(
+                                _pages[index]['image']!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
                               ),
                             ),
                           ),

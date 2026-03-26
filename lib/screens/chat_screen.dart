@@ -33,7 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
               1: "Concise",
               3: "Balanced",
               5: "Deep",
-              10: "Test",
+              10: "Ultra-Deep",
             };
 
             return Padding(
@@ -112,7 +112,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ? "⚖️ Balanced: A mix of explanation and direct tips."
                           : chatProvider.topK == 5
                           ? "📚 Deep: Comprehensive guide with technical details."
-                          : "Test",
+                          : "🧠 Ultra-Deep: Extended guide with deeper technical details.",
                       style: GoogleFonts.roboto(
                         fontSize: 13,
                         color: const Color(0xFF2E7D32),

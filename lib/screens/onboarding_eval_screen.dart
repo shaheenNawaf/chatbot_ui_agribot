@@ -23,24 +23,25 @@ class OnboardingEvalScreen extends StatefulWidget {
 }
 
 class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
-  static const String _apiUrl = "http://165.22.247.173:8000/chat";
+  static const String _apiUrl = String.fromEnvironment('API_BASE_URL');
   static const int _evalQuestionCount = 10;
 
   static const List<String> _allPrompts = [
-    "What is the best fertilizer for Cavendish bananas?",
-    "How can I prevent Panama disease in my banana plantation?",
-    "How do I induce flowering in mango trees during the off-season?",
-    "What are the early signs of mango pulp weevil infestation?",
-    "How do I control coconut scale insect infestations?",
-    "What is the recommended spacing for planting hybrid coconuts?",
-    "What is the ideal soil pH for planting sugarcane?",
-    "How can I manage stem borer pests in my sugarcane field?",
-    "What are the shade requirements for growing cacao seedlings?",
-    "How do I treat black pod rot in cacao trees?",
-    "What are the best practices for harvesting and drying abaca fibers?",
-    "When is the best time to plant yellow corn for maximum yield?",
-    "What is the proper way to cure onions after harvesting?",
-    "What is the recommended fertilizer schedule for MD2 pineapples?",
+    "What is the best way to prepare the land before planting rice?",
+    "How many kilos of rice seeds do I need to plant one hectare?",
+    "What is the difference between direct seeding and transplanting rice?",
+    "How do I know if my rice is ready to be harvested?",
+    "How can I control the golden kuhol (apple snail) in my rice field?",
+    "Why is it important to dry rice properly immediately after harvesting?",
+    "What is the best fertilizer combination to use to make rice grains heavier?",
+    "How do I control weeds in my rice field without using too much chemical spray?",
+    "How much water does my rice field need during the growing stage?",
+    "What is the best distance or spacing for planting cacao trees?",
+    "Why do young cacao trees need shade trees like bananas or coconut?",
+    "How do I know by looking if a cacao pod is ripe and ready for harvest?",
+    "What is the proper way to cut a cacao pod from the tree without damaging the branch?",
+    "How do I ferment cacao beans?",
+    "What should I do if my growing cacao pods turn black and rot?",
   ];
 
   final ScrollController _scrollController = ScrollController();
@@ -84,10 +85,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
     _askNextQuestion();
   }
 
-  // -------------------------------------------------------------------------
-  // Message helpers
-  // -------------------------------------------------------------------------
-
   void _addBotMessage(String text, {bool isFallback = false}) {
     setState(() {
       _messages.add(
@@ -116,10 +113,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
     _scrollToBottom();
   }
 
-  // -------------------------------------------------------------------------
-  // Eval flow
-  // -------------------------------------------------------------------------
-
   Future<void> _askNextQuestion() async {
     if (_currentQuestionIndex >= _evalQuestionCount) return;
 
@@ -139,7 +132,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
 
     setState(() => _isLoading = false);
 
-    // Show inline rating below the bot message we just added and await the result.
     final rating = await _showInlineRating(
       question: question,
       answer: answer,
@@ -199,8 +191,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
     throw Exception("Server returned ${response.statusCode}");
   }
 
-  /// Attaches the inline rating widget to [messageIndex] and returns a Future
-  /// that resolves with the submitted rating value once the user submits.
   Future<int?> _showInlineRating({
     required String question,
     required String answer,
@@ -225,13 +215,10 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
 
     final rating = _selectedRating!;
 
-    // Show the success animation.
     setState(() => _ratingSubmitted = true);
 
-    // Let the animation play before collapsing the widget.
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 1200));
 
-    // Hide the inline rating widget.
     setState(() {
       _pendingRatingMessageIndex = null;
       _pendingQuestion = null;
@@ -240,7 +227,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
       _ratingSubmitted = false;
     });
 
-    // Resolve the completer so _askNextQuestion can continue.
     if (!(_ratingCompleter?.isCompleted ?? true)) {
       _ratingCompleter!.complete(rating);
     }
@@ -262,9 +248,10 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
     await prefs.setBool('onboarding_complete', true);
 
     if (mounted) {
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const ChatScreen()));
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const ChatScreen()),
+        (route) => false,
+      );
     }
   }
 
@@ -279,10 +266,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
       }
     });
   }
-
-  // -------------------------------------------------------------------------
-  // Build
-  // -------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -449,7 +432,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
               ),
             ),
 
-            // ---- Inline rating widget ----
             if (hasPendingRating) ...[
               const SizedBox(height: 12),
               Divider(height: 1, color: Colors.green[100]),
@@ -462,7 +444,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
     );
   }
 
-  /// Animated switcher between the rating tiles and the saved confirmation.
   Widget _buildInlineRating() {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),

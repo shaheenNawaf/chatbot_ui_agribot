@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../models/message_model.dart';
 
 class ChatProvider with ChangeNotifier {
-  final String _apiUrl = "http://165.22.247.173:8000/chat";
+  final String _apiUrl = const String.fromEnvironment('API_BASE_URL');
 
   String? _sessionId;
   int _topK = 1;
@@ -16,22 +16,22 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  //Update Questions - sha
   final List<String> _allPrompts = [
-    "What is the best fertilizer for Cavendish bananas?",
-    "How can I prevent Panama disease in my banana plantation?",
-    "How do I induce flowering in mango trees during the off-season?",
-    "What are the early signs of mango pulp weevil infestation?",
-    "How do I control coconut scale insect infestations?",
-    "What is the recommended spacing for planting hybrid coconuts?",
-    "What is the ideal soil pH for planting sugarcane?",
-    "How can I manage stem borer pests in my sugarcane field?",
-    "What are the shade requirements for growing cacao seedlings?",
-    "How do I treat black pod rot in cacao trees?",
-    "What are the best practices for harvesting and drying abaca fibers?",
-    "When is the best time to plant yellow corn for maximum yield?",
-    "What is the proper way to cure onions after harvesting?",
-    "What is the recommended fertilizer schedule for MD2 pineapples?",
+    "What is the best way to prepare the land before planting rice?",
+    "How many kilos of rice seeds do I need to plant one hectare?",
+    "What is the difference between direct seeding and transplanting rice?",
+    "How do I know if my rice is ready to be harvested?",
+    "How can I control the golden kuhol (apple snail) in my rice field?",
+    "Why is it important to dry rice properly immediately after harvesting?",
+    "What is the best fertilizer combination to use to make rice grains heavier?",
+    "How do I control weeds in my rice field without using too much chemical spray?",
+    "How much water does my rice field need during the growing stage?",
+    "What is the best distance or spacing for planting cacao trees?",
+    "Why do young cacao trees need shade trees like bananas or coconut?",
+    "How do I know by looking if a cacao pod is ripe and ready for harvest?",
+    "What is the proper way to cut a cacao pod from the tree without damaging the branch?",
+    "How do I ferment cacao beans?",
+    "What should I do if my growing cacao pods turn black and rot?",
   ];
 
   List<String> _currentPrompts = [];

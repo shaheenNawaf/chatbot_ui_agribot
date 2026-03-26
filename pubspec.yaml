@@ -28,3 +28,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/step1.png
+    - assets/images/step2.png
+    - assets/images/step3.png
+    - assets/images/step4.png
