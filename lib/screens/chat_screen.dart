@@ -3,9 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/chat_provider.dart';
 import '../models/message_model.dart';
 import '../widgets/onboarding_modal.dart';
+import '../widgets/google_form_modal.dart';
+import '../services/device_id_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final bool onboardingComplete;
@@ -19,6 +22,33 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _showFeedbackBanner = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.onboardingComplete) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        OnboardingModal.showIfRequired(context);
+      });
+    }
+    _checkFeedbackBanner();
+  }
+
+  Future<void> _checkFeedbackBanner() async {
+    setState(() => _showFeedbackBanner = true);
+  }
+
+  void _dismissBanner() {
+    setState(() => _showFeedbackBanner = false);
+  }
+
+  Future<void> _openFeedbackForm() async {
+    final deviceId = await DeviceIdService.getDeviceId();
+    if (mounted) {
+      await GoogleFormModal.show(context, deviceId: deviceId);
+    }
+  }
 
   void _showSettingsSheet(BuildContext context) {
     showModalBottomSheet(
@@ -112,7 +142,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ? "⚖️ Balanced: A mix of explanation and direct tips."
                           : chatProvider.topK == 5
                           ? "📚 Deep: Comprehensive guide with technical details."
-                          : "🧠 Ultra-Deep: Extended guide with deeper technical details.",
+                          : "🧠 Ultra-Deep: Even more detailed responses",
                       style: GoogleFonts.roboto(
                         fontSize: 13,
                         color: const Color(0xFF2E7D32),
@@ -137,17 +167,6 @@ class _ChatScreenState extends State<ChatScreen> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Only trigger the onboarding modal if the eval flow hasn't been completed.
-    if (!widget.onboardingComplete) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        OnboardingModal.showIfRequired(context);
-      });
     }
   }
 
@@ -186,6 +205,11 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.feedback_outlined, color: Colors.white),
+            tooltip: "Feedback Form",
+            onPressed: _openFeedbackForm,
+          ),
+          IconButton(
             icon: const Icon(Icons.tune, color: Colors.white),
             tooltip: "Settings",
             onPressed: () => _showSettingsSheet(context),
@@ -201,6 +225,45 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
+          if (_showFeedbackBanner)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              color: Colors.green[50],
+              child: Row(
+                children: [
+                  const Text('🌾', style: TextStyle(fontSize: 16)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Enjoying Agri-Pinoy? Fill out our short feedback form!',
+                      style: GoogleFonts.roboto(
+                        fontSize: 13,
+                        color: Colors.green[800],
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _openFeedbackForm,
+                    child: Text(
+                      'Open Form',
+                      style: GoogleFonts.roboto(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF2E7D32),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _dismissBanner,
+                    child: Icon(
+                      Icons.close,
+                      size: 16,
+                      color: Colors.green[700],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: ListView.builder(
               controller: _scrollController,

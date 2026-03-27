@@ -46,3 +46,8 @@ app.*.map.json
 
 # Secret Environment Variables
 .env
+.env.web
+.vercel
+
+# Local Netlify folder
+.netlify

@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/message_model.dart';
 import '../services/device_id_service.dart';
 import '../services/supabase_eval_service.dart';
-import '../widgets/google_form_modal.dart';
 import 'chat_screen.dart';
 
 class OnboardingEvalScreen extends StatefulWidget {
@@ -54,11 +53,8 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
   String? _sessionId;
 
   int? _pendingRatingMessageIndex;
-
   int? _selectedRating;
-
   bool _ratingSubmitted = false;
-
   Completer<int>? _ratingCompleter;
 
   String? _pendingQuestion;
@@ -235,21 +231,19 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
   Future<void> _onEvalComplete() async {
     _addBotMessage(
       "Great job! 🎉 You've completed the evaluation. "
-      "Please fill out the short form below so we can link your responses.",
+      "You can now start chatting with Agri-Pinoy AI!",
     );
-
-    await Future.delayed(const Duration(milliseconds: 600));
-
-    if (mounted) {
-      await GoogleFormModal.show(context, deviceId: _deviceId ?? '');
-    }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
 
+    await Future.delayed(const Duration(milliseconds: 800));
+
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const ChatScreen()),
+        MaterialPageRoute(
+          builder: (_) => const ChatScreen(onboardingComplete: true),
+        ),
         (route) => false,
       );
     }
@@ -431,7 +425,6 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
                 ),
               ),
             ),
-
             if (hasPendingRating) ...[
               const SizedBox(height: 12),
               Divider(height: 1, color: Colors.green[100]),
