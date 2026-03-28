@@ -1,6 +1,6 @@
 {
-    "name": "chatbot_ui_agribot",
-    "short_name": "chatbot_ui_agribot",
+    "name": "Agri-Pinoy AI",
+  "short_name": "Agri-Pinoy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

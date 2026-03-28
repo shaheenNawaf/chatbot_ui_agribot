@@ -33,7 +33,6 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
 
-    // Always show the feedback banner on every launch
     _checkFeedbackBanner();
 
     if (!widget.onboardingComplete) {
@@ -41,8 +40,6 @@ class _ChatScreenState extends State<ChatScreen> {
         OnboardingModal.showIfRequired(context);
       });
     }
-
-    // Show the welcome modal after eval, then snackbar after dismissal
     if (widget.showWelcomeModal) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showWelcomeModal();
@@ -62,7 +59,6 @@ class _ChatScreenState extends State<ChatScreen> {
     final deviceId = await DeviceIdService.getDeviceId();
     if (mounted) {
       await GoogleFormModal.show(context, deviceId: deviceId);
-      // Banner stays visible — only X dismisses it for the session
     }
   }
 
@@ -541,14 +537,12 @@ class _ChatScreenState extends State<ChatScreen> {
         ? const Color(0xFF43A047)
         : (isFallback ? Colors.orange.shade50 : Colors.white);
 
-    final double maxBubbleWidth = MediaQuery.of(context).size.width * 0.75;
-
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        constraints: BoxConstraints(maxWidth: maxBubbleWidth),
+        constraints: const BoxConstraints(maxWidth: 350),
         decoration: BoxDecoration(
           color: bubbleColor,
           borderRadius: BorderRadius.only(

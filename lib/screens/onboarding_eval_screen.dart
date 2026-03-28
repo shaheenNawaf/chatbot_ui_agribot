@@ -244,7 +244,7 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
         MaterialPageRoute(
           builder: (_) => const ChatScreen(
             onboardingComplete: true,
-            showWelcomeModal: true,
+            showWelcomeModal: true, // triggers modal + snackbar sequence
           ),
         ),
         (route) => false,
