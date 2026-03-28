@@ -272,6 +272,26 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
         backgroundColor: const Color(0xFF2E7D32),
         elevation: 0,
         automaticallyImplyLeading: false,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('onboarding_complete', true);
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (_) => const ChatScreen(onboardingComplete: true),
+                  ),
+                  (route) => false,
+                );
+              }
+            },
+            child: Text(
+              'Skip',
+              style: GoogleFonts.poppins(color: Colors.white70, fontSize: 13),
+            ),
+          ),
+        ],
         title: Row(
           children: [
             const Icon(Icons.grass, color: Colors.white),

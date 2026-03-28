@@ -57,8 +57,9 @@ class _OnboardingModalState extends State<OnboardingModal> {
   ];
 
   void _completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_complete', true);
     if (_doNotShowAgain) {
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('show_onboarding', false);
     }
     if (mounted) {

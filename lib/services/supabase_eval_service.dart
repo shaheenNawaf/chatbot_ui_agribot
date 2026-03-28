@@ -12,6 +12,20 @@ class SupabaseEvalService {
     await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
   }
 
+  static Future<bool> hasExistingResponses(String deviceId) async {
+    try {
+      final result = await _client
+          .from(_table)
+          .select('id')
+          .eq('device_id', deviceId)
+          .limit(1);
+      return (result as List).isNotEmpty;
+    } catch (e) {
+      print('SupabaseEvalService: hasExistingResponses check failed — $e');
+      return false;
+    }
+  }
+
   static Future<void> saveEvalResponse({
     required String deviceId,
     required String question,

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/chat_provider.dart';
 import 'screens/chat_screen.dart';
 import 'services/supabase_eval_service.dart';
+import 'services/device_id_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,19 @@ void main() async {
   );
 
   final prefs = await SharedPreferences.getInstance();
-  final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+  bool onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+
+  // ← add this fallback block
+  if (!onboardingComplete) {
+    final deviceId = await DeviceIdService.getDeviceId();
+    final hasResponses = await SupabaseEvalService.hasExistingResponses(
+      deviceId,
+    );
+    if (hasResponses) {
+      await prefs.setBool('onboarding_complete', true);
+      onboardingComplete = true;
+    }
+  }
 
   runApp(MyApp(onboardingComplete: onboardingComplete));
 }
