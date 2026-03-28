@@ -242,7 +242,10 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (_) => const ChatScreen(onboardingComplete: true),
+          builder: (_) => const ChatScreen(
+            onboardingComplete: true,
+            showWelcomeModal: true,
+          ),
         ),
         (route) => false,
       );
@@ -271,7 +274,7 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            const Icon(Icons.agriculture, color: Colors.white),
+            const Icon(Icons.grass, color: Colors.white),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

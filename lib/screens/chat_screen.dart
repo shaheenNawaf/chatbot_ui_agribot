@@ -12,8 +12,13 @@ import '../services/device_id_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final bool onboardingComplete;
+  final bool showWelcomeModal;
 
-  const ChatScreen({super.key, this.onboardingComplete = false});
+  const ChatScreen({
+    super.key,
+    this.onboardingComplete = false,
+    this.showWelcomeModal = false,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -27,12 +32,22 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Always show the feedback banner on every launch
+    _checkFeedbackBanner();
+
     if (!widget.onboardingComplete) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         OnboardingModal.showIfRequired(context);
       });
     }
-    _checkFeedbackBanner();
+
+    // Show the welcome modal after eval, then snackbar after dismissal
+    if (widget.showWelcomeModal) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showWelcomeModal();
+      });
+    }
   }
 
   Future<void> _checkFeedbackBanner() async {
@@ -47,7 +62,108 @@ class _ChatScreenState extends State<ChatScreen> {
     final deviceId = await DeviceIdService.getDeviceId();
     if (mounted) {
       await GoogleFormModal.show(context, deviceId: deviceId);
+      // Banner stays visible — only X dismisses it for the session
     }
+  }
+
+  Future<void> _showWelcomeModal() async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.grass,
+                  color: Color(0xFF2E7D32),
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "You're all set! 🎉",
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2E7D32),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Thanks for completing the evaluation! You can now chat freely with Agri-Pinoy AI — ask anything about your crops.",
+                style: GoogleFonts.roboto(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showQuickPromptSnackbar();
+                  },
+                  child: Text(
+                    "Start Chatting",
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showQuickPromptSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Text('💡', style: TextStyle(fontSize: 16)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Tip: Tap a quick prompt below or type your question to get started!',
+                style: GoogleFonts.roboto(fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF2E7D32),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(12),
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 
   void _showSettingsSheet(BuildContext context) {
@@ -89,43 +205,52 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   const SizedBox(height: 25),
-                  Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: options.entries.map((entry) {
-                          bool isSelected = chatProvider.topK == entry.key;
-                          return InkWell(
-                            onTap: () => chatProvider.setTopK(entry.key),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? const Color(0xFF2E7D32)
-                                    : Colors.transparent,
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final double fontSize = constraints.maxWidth < 320
+                          ? 11
+                          : 13;
+                      return Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          children: options.entries.map((entry) {
+                            bool isSelected = chatProvider.topK == entry.key;
+                            return Expanded(
+                              child: InkWell(
+                                onTap: () => chatProvider.setTopK(entry.key),
                                 borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Text(
-                                entry.value,
-                                style: GoogleFonts.roboto(
-                                  fontWeight: FontWeight.bold,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.grey[700],
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? const Color(0xFF2E7D32)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Text(
+                                    entry.value,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.roboto(
+                                      fontSize: fontSize,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.grey[700],
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 25),
                   Container(
@@ -182,7 +307,7 @@ class _ChatScreenState extends State<ChatScreen> {
         elevation: 0,
         title: Row(
           children: [
-            const Icon(Icons.agriculture, color: Colors.white),
+            const Icon(Icons.grass, color: Colors.white),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +321,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 const Text(
-                  "Pinoy-Agriculture AI Chat",
+                  "Your Pinoy Farming Assistant",
                   style: TextStyle(fontSize: 10, color: Colors.white70),
                 ),
               ],
@@ -416,12 +541,14 @@ class _ChatScreenState extends State<ChatScreen> {
         ? const Color(0xFF43A047)
         : (isFallback ? Colors.orange.shade50 : Colors.white);
 
+    final double maxBubbleWidth = MediaQuery.of(context).size.width * 0.75;
+
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        constraints: const BoxConstraints(maxWidth: 350),
+        constraints: BoxConstraints(maxWidth: maxBubbleWidth),
         decoration: BoxDecoration(
           color: bubbleColor,
           borderRadius: BorderRadius.only(
