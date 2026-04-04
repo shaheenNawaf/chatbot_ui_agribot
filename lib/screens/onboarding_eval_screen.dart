@@ -43,6 +43,39 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
     "What should I do if my growing cacao pods turn black and rot?",
   ];
 
+  static const Map<String, String> _allExpectedAnswers = {
+    "What is the best way to prepare the land before planting rice?":
+        "There is no single best method, as the choice between wetland and dryland tillage depends on factors such as water supply, soil characteristics, crop establishment methods, and local resources. Wetland tillage involves tilling saturated or flooded soil, while dryland tillage prepares dry soil to create a firm seedbed and control weeds. Regardless of the method chosen, land preparation should be completed 21 days before transplanting to allow for organic matter decomposition and the eradication of weeds. A well-prepared field is characterized by thoroughly decayed organic materials, a puddled and leveled soil surface, and the elimination of competing weeds.",
+    "How many kilos of rice seeds do I need to plant one hectare?":
+        "They will need about 20-40 kilos/hectare on a wetbed plot, while 45-65 kilos/hectare on a dapog plot. ",
+    "What is the difference between direct seeding and transplanting rice?":
+        "Direct Seeding refers to the method of seeds being sown directly in the field, whereas the transplanting involves seedlings raised in seedbeds before planted on the fields",
+    "How do I know if my rice is ready to be harvested?":
+        "You can tell by gathering a spoonful of grain; if the hulled kernels are clear, translucent, and firm, the crop is ready. Another indicator is when 80-85% of the grains at the upper portion of the panicles are yellowish or straw-colored, or when those at the base are at the hard dough stage. Proper timing prevents losses from shattering, lodging, and pests.",
+    "How can I control the golden kuhol (apple snail) in my rice field?":
+        "Control GAS (Golden Apple Snail) by handpicking snails during the morning and late afternoon when they are most active or by placing bamboo stakes to easily collect and crush their egg masses. You can also use attractants like gabi or banana leaves and place wire screens on water inlets to prevent hatchlings from entering. Additionally, herding ducks into paddies 30-45 days after transplanting helps reduce the snail population.",
+    "Why is it important to dry rice properly immediately after harvesting?":
+        "Palay must be dried to a moisture content of 14% or below within 24 hours of harvest to prevent deterioration from heat and relative humidity. Failure to dry properly makes the grain more susceptible to active insects and diseases during storage. Furthermore, improper drying leads to grain fissures, which lowers milling efficiency and the overall market value.",
+    "What is the best fertilizer combination to use to make rice grains heavier?":
+        "Applying Potassium (K) is essential because it increases leaf area, the percentage of filled grains, and overall grain weight. A recommended basal application for soils deficient in this nutrient is a combination of 20-25 kg Nitrogen (N) and 20-30 kg Potassium (K2O). This can be achieved using one bag of urea mixed with one bag of 0-0-60 fertilizer.",
+    "How do I control weeds in my rice field without using too much chemical spray?":
+        "Effective non-chemical methods include hand-weeding or using rotary-weeders in straight-row transplanted rice when the soil is soft and saturated. Water management can also suppress weeds if a thin water blanket is introduced before weeds emerge above the soil surface. Proper land preparation, such as puddling and the 'stale seedbed technique,' further prevents weed growth.",
+    "How much water does my rice field need during the growing stage?":
+        "For medium to heavy-textured soils, the total irrigation requirement is approximately 700 to 1,500 mm of water per cropping season. During the active growing period, a water depth of around 5-7 cm should be maintained. However, shallower depths of 2-3 cm are recommended during the seedling and tillering stages to promote better growth.",
+    "What is the best distance or spacing for planting cacao trees?":
+        "The most common planting distances depend on the desired density: high density is 1.5 to 2.0 x 6.0 meters (2,300 trees/ha), while low density ranges from 2.5 x 2.5 meters (1,600 trees/ha) to 3 x 2 meters (1,666 trees/ha). If intercropping with coconut or cashew, the density averages about 600 plants per hectare.",
+    "Why do young cacao trees need shade trees like bananas or coconut?":
+        "Newly planted cocoa trees are particularly sensitive to high light levels and require 75% shade (25% direct sunlight) during their first year to prevent sunburn and planting stress. Ideal companion crops like coconut and banana provide this protection because they have tall trunks and thin canopies that do not defoliate seasonally.",
+    "How do I know by looking if a cacao pod is ripe and ready for harvest?":
+        "Ripeness is indicated by the color change of the pod; for example, the BR25 variety turns from reddish-green to yellow, while the K1 variety turns from young red to a yellow or orange hue when mature. Harvesting at the correct time is vital to ensure bean size and quality are not reduced.",
+    "What is the proper way to cut a cacao pod from the tree without damaging the branch?":
+        "To protect the flowering cushions on the tree, you should use secateurs to harvest the pods cleanly and safely. Avoid harvesting green pods or over-ripe pods, as this reduces the size and quality of the beans. ",
+    "How do I ferment cacao beans?":
+        "During fermentation, use properly constructed wooden boxes with slats, covering the beans with banana leaves and jute bags or cloth rags. It is important to drain the juices (sweatings) from the bean mass and turn the beans after 2 days (48 hours) and again after 4 days (96 hours).",
+    "What should I do if my growing cacao pods turn black and rot?":
+        "This condition, known as Black Pod Rot, should be managed by frequent harvesting to avoid pathogen spread and by burying or composting all infested, dead, or mummified pods. You should also prune the cacao and shade trees to reduce humidity and ensure the field has a good drainage system to prevent spores from spreading in puddles. ",
+  };
+
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
   final List<String> _sessionQuestions = [];
@@ -478,6 +511,38 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
       key: const ValueKey('rating_tiles'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (_pendingQuestion != null &&
+            _allExpectedAnswers.containsKey(_pendingQuestion)) ...[
+          Text(
+            "📖 Expected Answer (Book)",
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.brown[700],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.brown[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.brown.shade200),
+            ),
+            child: Text(
+              _allExpectedAnswers[_pendingQuestion!]!,
+              style: GoogleFonts.roboto(
+                fontSize: 13,
+                color: Colors.brown[800],
+                height: 1.4,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Divider(height: 1, color: Colors.green[100]),
+          const SizedBox(height: 12),
+        ],
         Text(
           "How relevant was that response?",
           style: GoogleFonts.poppins(
