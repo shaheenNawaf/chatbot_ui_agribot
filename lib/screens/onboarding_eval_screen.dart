@@ -513,30 +513,40 @@ class _OnboardingEvalScreenState extends State<OnboardingEvalScreen> {
       children: [
         if (_pendingQuestion != null &&
             _allExpectedAnswers.containsKey(_pendingQuestion)) ...[
-          Text(
-            "📖 Expected Answer (Book)",
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.brown[700],
-            ),
-          ),
-          const SizedBox(height: 4),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.brown[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.brown.shade200),
-            ),
-            child: Text(
-              _allExpectedAnswers[_pendingQuestion!]!,
-              style: GoogleFonts.roboto(
-                fontSize: 13,
-                color: Colors.brown[800],
-                height: 1.4,
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
+              dense: true,
+              title: Text(
+                "📖 Expected Answer (Book)",
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.brown[700],
+                ),
               ),
+              children: [
+                const SizedBox(height: 4),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.brown[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.brown.shade200),
+                  ),
+                  child: Text(
+                    _allExpectedAnswers[_pendingQuestion!]!,
+                    style: GoogleFonts.roboto(
+                      fontSize: 13,
+                      color: Colors.brown[800],
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 14),
